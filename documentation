@@ -1,0 +1,144 @@
+=====================================================
+Information about miRNA-seq profiling pipeline 
+=====================================================
+
+Pipeline uses miRDeep2 and/or mirAligner to annotate and quantify human miRNAs 
+
+
+Dependencies for miRpipe:
+
+1) miRDeep2     from: https://github.com/rajewsky-lab/mirdeep2
+2) mirAligner   from: https://github.com/lpantano/seqbuster/tree/master/modules/miraligner
+1) Bioperl      from: http://www.bioperl.org/wiki/Installing_BioPerl_on_Ubuntu_Server
+2) Blast+       from: ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/
+3) Blast        from: ftp://ftp.ncbi.nlm.nih.gov/blast/executables/LATEST/
+4) EDirect      from: http://www.ncbi.nlm.nih.gov/books/NBK179288/#chapter6.Examples 
+
+
+Prepare databases and references for miRpipe
+=====================================================
+
+To prepare all needed databases and references for the pipeline USE update_db.sh script which updates the databases used in IKMB miRNA pipeline.
+
+Script generates directory (in your current working directory) which has the following structure and files (||- shows from where files were downloaded or how they were generated):
+
+|--databases_date
+|	|
+|	|-- human_RNA--	|
+|	|		|-- Rfam.fa				||- ftp://ftp.ebi.ac.uk/pub/databases/Rfam/CURRENT/fasta_files/*.fa.gz
+|	|		|-- Rfam.db.*				||- formatdb -i virus_hairpin.fa -pF -oT -n virus_hairpin.db
+|	|
+|	|
+|	|-- viral_RNA--	|
+|	|		|-- viral_genome_RefSeq.fa		||- esearch -db nucleotide -query "Viruses [PORG] AND srcdb_refseq [PROP] AND complete genome [WORD]"
+|	|		|-- viral_genome_RefSeq.db*		||- formatdb -i viral_genome_RefSeq.fa -pF -oT -n viral_genome_RefSeq.db
+|	|		|
+|	|		|-- virus_hairpin.fa			||- ftp://mirbase.org/pub/mirbase/CURRENT/hairpin.fa.gz
+|	|		|-- virus_hairpin.db.*			||- formatdb -i virus_hairpin.fa -pF -oT -n virus_hairpin.db
+|	|		
+|	|
+|	|-- mature-- 	|
+|	|		|-- hsa_mature_mirbase_vX.fa		||- ftp://mirbase.org/pub/mirbase/VERSION_X/mature.fa.gz
+|	|		|-- hominidae_mature_mirbase_vX.fa	||- ftp://mirbase.org/pub/mirbase/VERSION_X/hairpin.fa.gz
+|	|
+|	|		
+|	|-- hairpin--	|
+|	|		|-- hsa_hairpin_vX.fa			||- ftp://mirbase.org/pub/mirbase/VERSION_X/hairpin.fa.gz 
+|	|
+|	|		
+|	
+==================================================================================
+
+
+Structure of miRpipe
+==========================================
+
+miRpipe.sh is the main script of the pipeline, please add necessary paths inside the script before starting to run the pipeline.   
+miRpipe.sh calls scripts in the following order (only 3 levels are shown):
+
+|-- miRpipe.sh
+|		|
+|		|-> process_reads.sh
+		|		|
+		|		|-> cutadapt  
+		|		|-> fastq2fasta.pl
+		|		|-> collapse_reads_md.pl
+		|
+  		|	
+		|-> filter_reads.sh
+		|		|
+ 		|		|-> find_read_count.pl
+		|		|-> blastn
+		|		|-> fastacmd
+        |
+        |
+		|---|--> run_miraligner.sh
+        |   |           |-> miraligner.jar
+		|	| AND/OR	
+        |   |
+		|	|--> run_quantifier.sh
+  		|               |-> quantifier.pl
+		|		
+        |
+		|-> predict_reads.sh		
+		|		|
+		|		|-> mapper.pl
+				|-> miRDeep2.pl
+
+
+For further explanations and options of the pipeline, please call 1st and 2nd level scripts by using -h option e.g. "miRpipe.sh -h". 
+Please describe the options of 2nd level scripts inside the miRpipe.sh script. Otherwise the default options will be used. 
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+Input and output stucture for miRpipe
+==========================================
+
+example of path to the imput files: /home/user/samples/project_ID_samples/
+
+Please make sure that your provided samples are arranged in the following structure:
+
+|-- project_ID_samples
+|		|	
+|		|-- run_ID_samples	
+		|	|
+		|	|-- sample_1_ID
+		|	|	|
+		|	|	|-- sample_1.fastq.gz 
+		|	|
+		|	|-- sample_2_ID
+		|	|	|
+		|	|	|--sample_2.fastq.gz
+		|	|	 	
+------------------------------------------------------------
+
+example of path to the output files: /home/user/samples/project_ID_results/
+
+For the output files you only need to make a directory "project_ID_r_outesults" and the following directories will be generated automatically:
+
+|-- project_ID_results
+|		|	
+|		|-- run_ID_results	
+		|	|
+		|	|-- sample_1_ID
+		|	|	|
+		|	|	|-- miRpipe_out_date
+		|	|		|
+		|	|		|-- dir_blastn_date (optional, output of filtering step)
+		|	|		|-- dir_mapper_date (optional, output of mirdeep2 prediction step)
+		|	|		|-- for_general_statistics
+		|	|		|-- expression_analyses (optional, output of quantifier.pl)
+		|	|		|-- mirdeep_runs (optional, output of mirdeep2 prediction step)
+		|	|		|-- reads.fa
+		|	|		|-- reads_colapsed.fa
+		|	|		|-- reads_filtered.fa (optional, created in filtering step)
+		|	|		|-- reads_collapsed_vs_genome.arf (optional, output of mirdeep2 prediction step)
+		|	|		|-- miRNAs_expressed_all_samples_*.csv (optional, output of quantifier.pl)
+        |   |       |-- isomir_sampleID.mirna (optional, output of miraligner.jar)
+		|	|		|-- other additional files
+		|	|	
+--------------------------------------------------------------------------------------------
+==============================================================================================
+
+
+
+

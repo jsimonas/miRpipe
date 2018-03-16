@@ -1,0 +1,20 @@
+---
+title: "miRpipe"
+author: "Simonas Juzenas"
+date: "`r format(Sys.Date())`"
+output: github_document
+
+---
+***
+
+#### Simplified scheme of the pipeline:
+
+![](misc/pipe_scheme.png)
+
+
+```{r pressure, echo=FALSE, include=TRUE}
+
+
+```
+
+
