@@ -1,5 +1,3 @@
-setwd("/Users/simonas/Desktop/pipeline/IKMB_pipe_v2/misc")
-
 
 library(DiagrammeR)
 library(DiagrammeRsvg)
@@ -28,7 +26,7 @@ pipe <-
         B [label = 'COLLAPSE READS\n(collapse_reads_md.pl)\ncollapsed.trimmed.fastq']
         C [label = 'miRNA/isomiR ANNOTATION\n(miraligner.jar)\ncounts.mirna']
         D [label = 'miRNA ANNOTATION\n(quantifier.pl)\ncounts.tsv']
-        F [label = 'OUTPUT\n(dir=${sample}/IKMB_miRNA_pipe_out))\nresults']
+        F [label = 'OUTPUT\n(dir=$sample/miRpipe_out))\nresults']
         I [label = 'DOWNSTREAM ANALYSES\n(DESeq2 / isomiRs, R)\nresults']
         G [label = 'VIRUS FILTER\n(RefSeq & miRBase)\n.fasta']
         H [label = 'tRNA, rRNA, snRNA & sRNA FILTER\n(Rfam)\n.fasta']
