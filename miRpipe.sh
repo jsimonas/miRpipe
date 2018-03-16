@@ -58,7 +58,7 @@ while getopts "$OPTSTRING" SWITCH ; do
         e) path_to_script_folder="$OPTARG"
 		;;
         d) path_to_databases="$OPTARG"
-		;;
+        ;;
 		r) run_process=1
 		;;
 		f) run_filters=1
@@ -145,24 +145,24 @@ else
 fi
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
-# # calling quantify_reads.sh (known miRNA quantification)  # #
+# # calling run_quantifier.sh (known miRNA quantification)  # #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 if [  $run_quantifier -eq 1 ]; then
 	echo "Generating known miRNA profile..."
-	bash ${path_to_script_folder}quantify_reads.sh -o $path_to_output -d $mirna_mature -a $mirna_hairpin 
+	bash ${path_to_script_folder}run_quantifier.sh -o $path_to_output -d $mirna_mature -a $mirna_hairpin 
 	echo
 else
 	echo "Skipping quantification of known miRNAs..."
 fi
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
-# # calling miraligner_pipe.sh (isomiR quantification)  # #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # calling run_miraligner.sh (isomiR quantification) # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 if [  $run_quantifier -eq 1 ]; then
 	echo "Quantifying isomiRs..."
-	bash ${path_to_script_folder}miraligner_pipe.sh -i $path_to_output -d $mirAligner_DB
+	bash ${path_to_script_folder}run_miraligner.sh -i $path_to_output -d $mirAligner_DB
 	echo
 else
 	echo "Skipping quantification of isomiRs..."
@@ -181,41 +181,6 @@ else
 	echo "Skipping de novo prediction of miRNAs..."
 fi
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# # calling cali_quantify.sh (Calibrator quantification.) # #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
-
-if [ $quantify_cali -eq 1 ]; then
-	echo "Generating calibrator quantify files..."
-	bash ${path_to_script_folder}cali_quantify.sh -o $path_to_output -s $path_to_script_folder
-	echo
-else
-    echo "Skipping cali quantification..."
-fi
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
-# # calling import_miRNA_mysql.sh (imports known miRNA counts to MySQL database)  # #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-if [ $import_counts -eq 1 ]; then
-	echo "Parsing miRNA quantification data to database..."
-	bash ${path_to_script_folder}import_miRNA_mysql.sh -o $path_to_output -s $path_to_script_folder -d $mysql -v $mirbase
-	echo
-else
-    echo "Skipping to parse known miRNA quantification data to database..."
-fi
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# # calling import_cali_mysql.sh (imports calibrator counts to MySQL database)  # #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-if [ $import_cali_counts -eq 1 ]; then
-	echo "Parsing calibrator quantification data to database..."
-	bash ${path_to_script_folder}import_cali_mysql.sh -o $path_to_output -s $path_to_script_folder -d $mysql -v $mirbase
-	echo
-else
-    echo "Skipping to parse calibrator quantification data to database..."
-fi
 
 echo
 echo "Finished."
